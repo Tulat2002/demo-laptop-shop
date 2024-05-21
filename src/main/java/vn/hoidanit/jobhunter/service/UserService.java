@@ -1,5 +1,6 @@
 package vn.hoidanit.jobhunter.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
@@ -11,12 +12,15 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User handleCreateUser(User user){
+        //user.setPassword(passwordEncoder.encode(user.getPassword()));
         return this.userRepository.save(user);
     }
 
@@ -47,4 +51,9 @@ public class UserService {
     public void handleDeleteUser(long id){
         this.userRepository.deleteById(id);
     }
+
+    public User handleGetUserByUsername(String username){
+        return this.userRepository.findByEmail(username);
+    }
+
 }
