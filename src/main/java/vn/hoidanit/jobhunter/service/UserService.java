@@ -7,21 +7,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.Meta;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDto;
+import vn.hoidanit.jobhunter.domain.dto.*;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public User handleCreateUser(User user){
@@ -49,7 +47,19 @@ public class UserService {
         mt.setTotal(pageUser.getTotalElements());
 
         rs.setMeta(mt);
-        rs.setResult(pageUser.getContent());
+
+        List<ResUserDto> lisUser = pageUser.getContent()
+                        .stream().map(item -> new ResUserDto(
+                        item.getId(),
+                        item.getName(),
+                        item.getEmail(),
+                        item.getAge(),
+                        item.getGender(),
+                        item.getAddress(),
+                        item.getUpdatedAt(),
+                        item.getCreatedAt())).collect(Collectors.toList());
+
+        rs.setResult(lisUser);
 
         return rs;
     }
@@ -58,8 +68,9 @@ public class UserService {
         User currentUser = this.fetchUserById(reqUser.getId());
         if (currentUser != null){
             currentUser.setName(reqUser.getName());
-            currentUser.setEmail(reqUser.getEmail());
-            currentUser.setPassword(reqUser.getPassword());
+            currentUser.setAddress(reqUser.getAddress());
+            currentUser.setGender(reqUser.getGender());
+            currentUser.setAge(reqUser.getAge());
             //update
             currentUser = this.userRepository.save(currentUser);
         }
@@ -72,6 +83,46 @@ public class UserService {
 
     public User handleGetUserByUsername(String username){
         return this.userRepository.findByEmail(username);
+    }
+
+    public boolean existsByEmail(String email){
+        return this.userRepository.existsByEmail(email);
+    }
+
+    public ResCreateUserDto convertToResCreateUserDto(User user){
+        ResCreateUserDto resCreateUserDto = new ResCreateUserDto();
+        resCreateUserDto.setId(user.getId());
+        resCreateUserDto.setEmail(user.getEmail());
+        resCreateUserDto.setName(user.getName());
+        resCreateUserDto.setAge(user.getAge());
+        resCreateUserDto.setAddress(user.getAddress());
+        resCreateUserDto.setGender(user.getGender());
+        resCreateUserDto.setCreatedAt(user.getCreatedAt());
+        return resCreateUserDto;
+    }
+
+    public ResUserDto convertToResUserDto(User user){
+        ResUserDto resUserDto = new ResUserDto();
+        resUserDto.setId(user.getId());
+        resUserDto.setEmail(user.getEmail());
+        resUserDto.setName(user.getName());
+        resUserDto.setAge(user.getAge());
+        resUserDto.setAddress(user.getAddress());
+        resUserDto.setGender(user.getGender());
+        resUserDto.setCreatedAt(user.getCreatedAt());
+        resUserDto.setUpdatedAt(user.getUpdatedAt());
+        return resUserDto;
+    }
+
+    public ResUpdateUserDto convertToResUpdateUserDto(User user){
+        ResUpdateUserDto resUpdateUserDto = new ResUpdateUserDto();
+        resUpdateUserDto.setId(user.getId());
+        resUpdateUserDto.setName(user.getName());
+        resUpdateUserDto.setAge(user.getAge());
+        resUpdateUserDto.setAddress(user.getAddress());
+        resUpdateUserDto.setGender(user.getGender());
+        resUpdateUserDto.setUpdatedAt(user.getUpdatedAt());
+        return resUpdateUserDto;
     }
 
 }

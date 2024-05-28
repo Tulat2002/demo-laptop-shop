@@ -1,6 +1,7 @@
 package vn.hoidanit.jobhunter.controller;
 
 import com.turkraft.springfilter.boot.Filter;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,6 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.dto.ResCreateUserDto;
+import vn.hoidanit.jobhunter.domain.dto.ResUpdateUserDto;
+import vn.hoidanit.jobhunter.domain.dto.ResUserDto;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDto;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
@@ -31,11 +35,16 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createNewUser(@RequestBody User postManUser) {
-        String hashedPassword = this.passwordEncoder.encode(postManUser.getPassword());
-        postManUser.setPassword(hashedPassword);
-        User user = this.userService.handleCreateUser(postManUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    @ApiMessage("Create a new User")
+    public ResponseEntity<ResCreateUserDto> createUser(@Valid @RequestBody User user) throws IdInvalidException{
+        boolean emailExists = this.userService.existsByEmail(user.getEmail());
+        if (emailExists) {
+            throw  new IdInvalidException("Email " + user.getEmail() + " da ton tai, vui long su dung email khac.");
+        }
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
+        User saveUser = this.userService.handleCreateUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDto(saveUser));
     }
 
     @GetMapping("/users")
@@ -46,24 +55,33 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
-        User fetchedUser = this.userService.fetchUserById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(fetchedUser);
+    @ApiMessage("Fetch User By Id")
+    public ResponseEntity<ResUserDto> getUserById(@PathVariable("id") long id) throws IdInvalidException {
+        User fetchUser = this.userService.fetchUserById(id);
+        if (fetchUser == null){
+            throw new IdInvalidException("User voi id " + id + " khong ton tai");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToResUserDto(fetchUser));
     }
 
     @PutMapping("/users")
-    public ResponseEntity<User> updateUser(@RequestBody User updatedUser) {
-        User user = this.userService.handleUpdateUser(updatedUser);
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+    public ResponseEntity<ResUpdateUserDto> updateUser(@RequestBody User updatedUser) throws IdInvalidException {
+       User user = this.userService.handleUpdateUser(updatedUser);
+       if (user == null){
+           throw new IdInvalidException("User voi id " + user.getId() + " khong ton tai");
+       }
+       return ResponseEntity.ok(this.userService.convertToResUpdateUserDto(user));
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
-        if (id >=1500){
-            throw new IdInvalidException("Id khong lon hon 1500");
+    @ApiMessage("Delete a user")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
+        User currentUser = this.userService.fetchUserById(id);
+        if (currentUser == null){
+            throw new IdInvalidException("User voi id " + id + " khong ton tai");
         }
         this.userService.handleDeleteUser(id);
-        return ResponseEntity.ok("Deleted user successfully");
+        return ResponseEntity.ok(null);
     }
 
 }
