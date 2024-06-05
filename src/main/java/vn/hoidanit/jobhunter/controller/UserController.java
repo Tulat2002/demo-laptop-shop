@@ -2,7 +2,6 @@ package vn.hoidanit.jobhunter.controller;
 
 import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -11,16 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.ResCreateUserDto;
-import vn.hoidanit.jobhunter.domain.dto.ResUpdateUserDto;
-import vn.hoidanit.jobhunter.domain.dto.ResUserDto;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDto;
+import vn.hoidanit.jobhunter.domain.response.ResCreateUserDto;
+import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDto;
+import vn.hoidanit.jobhunter.domain.response.ResUserDto;
+import vn.hoidanit.jobhunter.domain.response.ResultPaginationDto;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
-
-import java.util.List;
-import java.util.Optional;
 
 
 @RestController
