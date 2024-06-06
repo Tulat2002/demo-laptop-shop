@@ -1,6 +1,6 @@
 package vn.hoidanit.jobhunter.domain.response;
 
-import lombok.Data;
+import lombok.*;
 import vn.hoidanit.jobhunter.util.enums.GenderEnum;
 
 import java.time.Instant;
@@ -14,5 +14,14 @@ public class ResUpdateUserDto {
     private GenderEnum gender;
     private String address;
     private Instant updatedAt;
+
+    private CompanyUser company;
+
+    @Getter
+    @Setter
+    public static class CompanyUser{
+        private long id;
+        private String name;
+    }
 
 }
