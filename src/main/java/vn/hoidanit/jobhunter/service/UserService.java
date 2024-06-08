@@ -151,21 +151,21 @@ public class UserService {
     }
 
     public ResUpdateUserDto convertToResUpdateUserDto(User user){
-        ResUpdateUserDto resUpdateUserDto = new ResUpdateUserDto();
-        ResUpdateUserDto.CompanyUser companyUser = new ResUpdateUserDto.CompanyUser();
-
-        if (user.getCompany() != null){
-            companyUser.setId(user.getCompany().getId());
-            companyUser.setName(user.getCompany().getName());
-            resUpdateUserDto.setCompany(companyUser);
+        ResUpdateUserDto res = new ResUpdateUserDto();
+        ResUpdateUserDto.CompanyUser com = new ResUpdateUserDto.CompanyUser();
+        if (user.getCompany() != null) {
+            com.setId(user.getCompany().getId());
+            com.setName(user.getCompany().getName());
+            res.setCompany(com);
         }
-        resUpdateUserDto.setId(user.getId());
-        resUpdateUserDto.setName(user.getName());
-        resUpdateUserDto.setAge(user.getAge());
-        resUpdateUserDto.setAddress(user.getAddress());
-        resUpdateUserDto.setGender(user.getGender());
-        resUpdateUserDto.setUpdatedAt(user.getUpdatedAt());
-        return resUpdateUserDto;
+
+        res.setId(user.getId());
+        res.setName(user.getName());
+        res.setAge(user.getAge());
+        res.setUpdatedAt(user.getUpdatedAt());
+        res.setGender(user.getGender());
+        res.setAddress(user.getAddress());
+        return res;
     }
 
     public void updateUserToken(String token, String email){
