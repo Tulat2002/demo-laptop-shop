@@ -83,4 +83,11 @@ public class ResumeController {
         return ResponseEntity.ok().body(null);
     }
 
+    @PostMapping("/resumes/by-user")
+    @ApiMessage("Get list resumes by user")
+    public ResponseEntity<ResultPaginationDto> fetchResumeByUser(Pageable pageable) {
+
+        return ResponseEntity.ok().body(this.resumeService.fetchResumeByUser(pageable));
+    }
+
 }
