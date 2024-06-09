@@ -1,12 +1,11 @@
 package vn.hoidanit.jobhunter.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -34,6 +33,23 @@ public class FileService {
         } else {
             System.out.println(">>> SKIP MAKING DIRECTORY, ALREADY EXISTS");
         }
+    }
+
+    public long getFileLength(String fileName, String folder) throws URISyntaxException {
+        URI uri = new URI(baseURI + folder + "/" + fileName);
+        Path path = Paths.get(uri);
+        File tmpDir = new File(path.toString());
+        //file khong ton tai, hoac file la mot directory => return 0
+        if (!tmpDir.exists() || tmpDir.isDirectory())
+            return 0;
+        return tmpDir.length();
+    }
+
+    public InputStreamResource getResource(String fileName, String folder) throws FileNotFoundException, URISyntaxException {
+        URI uri = new URI(baseURI + folder + "/" + fileName);
+        Path path = Paths.get(uri);
+        File file = new File(path.toString());
+        return new InputStreamResource(new FileInputStream(file));
     }
 
     public String store(MultipartFile file, String folder) throws URISyntaxException,

@@ -1,49 +1,42 @@
 package vn.hoidanit.jobhunter.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import vn.hoidanit.jobhunter.util.SecurityUtil;
-import vn.hoidanit.jobhunter.util.enums.GenderEnum;
+import vn.hoidanit.jobhunter.util.enums.ResumeStateEnum;
 
 import java.time.Instant;
-import java.util.List;
 
-//domain driver design
 @Entity
+@Table(name = "resumes")
 @Getter
 @Setter
-@Table(name = "users")
-public class User {
+public class Resume {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String name;
-    @NotBlank(message = "Email khong duoc de trong")
+    @NotBlank(message = "email không được để trống")
     private String email;
-    @NotBlank(message = "Password khong duoc de trong")
-    private String password;
-    private int age;
+
+    @NotBlank(message = "url không được để trống (upload cv chưa thành công)")
+    private String url;
     @Enumerated(EnumType.STRING)
-    private GenderEnum gender;
-    private String address;
-    @Column(columnDefinition = "MEDIUMTEXT")
-    private String refreshToken;
+    private ResumeStateEnum status;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
 
     @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonIgnore
-    List<Resume> resumes;
+    @ManyToOne
+    @JoinColumn(name = "job_id")
+    private Job job;
 
     @PrePersist
     public void handleBeforeCreate(){

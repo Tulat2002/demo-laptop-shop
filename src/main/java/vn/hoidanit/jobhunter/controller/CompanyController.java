@@ -12,6 +12,8 @@ import vn.hoidanit.jobhunter.domain.response.ResultPaginationDto;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1")
 public class CompanyController {
@@ -36,8 +38,10 @@ public class CompanyController {
     }
 
     @GetMapping("/companies/{id}")
-    public ResponseEntity<Company> fetchCompanyById(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.fetchCompanyById(id));
+    @ApiMessage("fetch company by id")
+    public ResponseEntity<Company> fetchCompanyById(@PathVariable("id") Long id) {
+        Optional<Company> company = this.companyService.findById(id);
+        return ResponseEntity.ok().body(company.get());
     }
 
     @PutMapping("/companies")
